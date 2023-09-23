@@ -50,7 +50,7 @@ export function handleApplicationErrors(
     });
   }
 
-  if (err.name === 'EnrollmentNotFoundError') {
+  if (err.name === 'EnrollmentNotFoundError' || err.name === 'ticketTypeNotFoundError') {
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 
