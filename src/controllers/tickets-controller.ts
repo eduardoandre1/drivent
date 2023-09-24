@@ -10,7 +10,7 @@ export async function getTicketsType(req: Request, res: Response) {
 }
 export async function getTickets(req: Request, res: Response) {
   const { ticketTypeId } = req.body;
-  if (!ticketTypeId) throw { name: 'ticketTypeNotFoundError' };
+  if (!ticketTypeId) throw { name: 'NotFoundError', message: 'ticket Type id is not valid' };
   const ticket = await getTicketsService(ticketTypeId);
   res.status(httpStatus.OK).json(ticket);
 }

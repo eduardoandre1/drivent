@@ -2,6 +2,7 @@ import { Ticket, TicketType } from '@prisma/client';
 import { prisma } from '@/config';
 
 type createTicket = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
+
 export async function readType(): Promise<TicketType[]> {
   const type = await prisma.ticketType.findMany();
   console.log('repository', type);

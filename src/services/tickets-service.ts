@@ -17,5 +17,5 @@ export async function getTicketsService(enrol: number | string) {
 }
 export async function createTicketService(entrada: Ticket) {
   const types = await readTicket(entrada.ticketTypeId);
-  if (!types) throw { name: 'InvalidDataError', message: 'ticket type not found' };
+  if (!types) throw { name: '', message: 'ticket type not found' };
 }
