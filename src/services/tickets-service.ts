@@ -3,10 +3,7 @@ import { readTicket, readType } from '@/repositories/tickets-repository';
 
 export async function ticketTypeService() {
   const types = await readType();
-  console.log();
-  if (types.length === 0) {
-    return [];
-  }
+  console.log(types);
   return types;
 }
 
