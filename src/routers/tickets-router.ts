@@ -3,7 +3,7 @@ import { getTickets, getTicketsType, sendTickets } from '@/controllers/tickets-c
 import { authenticateToken } from '@/middlewares';
 
 const ticketsRouter = Router();
-//ticketsRouter.all('/*', authenticateToken);
+ticketsRouter.all('/*', authenticateToken);
 ticketsRouter.get('/types', getTicketsType);
 ticketsRouter.get('/', getTickets);
 ticketsRouter.post('/', sendTickets);
