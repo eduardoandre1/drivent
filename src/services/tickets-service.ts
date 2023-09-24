@@ -1,4 +1,4 @@
-import { Ticket, TicketType } from '@prisma/client';
+import { Ticket } from '@prisma/client';
 import { createTicket, readTicket, readType } from '@/repositories/tickets-repository';
 import { enrollmentRepository } from '@/repositories';
 
@@ -27,5 +27,5 @@ export async function createTicketService(entrada: Ticket, userId: number | stri
 
   if (entrada.ticketTypeId === undefined) throw { name: 'EnrollmentNotFoundError' };
 
-  const ticket = await createTicket(entrada);
+  const ticket = await createTicket(entrada.ticketTypeId, enrollment.id);
 }

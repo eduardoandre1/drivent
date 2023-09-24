@@ -1,4 +1,4 @@
-import { Ticket, TicketType } from '@prisma/client';
+import { Ticket } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { createTicketService, getTicketsService, ticketTypeService } from '@/services/tickets-service';

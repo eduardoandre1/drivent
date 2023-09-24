@@ -6,7 +6,6 @@ type createTicket = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
 export async function readType(): Promise<TicketType[]> {
   const type = await prisma.ticketType.findMany();
   console.log('repository', type);
-  const array = [type];
   return type;
 }
 export async function readTicket(enrol: number): Promise<Ticket> {
@@ -26,11 +25,9 @@ export async function readTicket(enrol: number): Promise<Ticket> {
   return ticket;
 }
 
-export async function createTicket(ticket: createTicket) {
-  const { status, enrollmentId, ticketTypeId } = ticket;
-  const createdAt: Date = new Date();
+export async function createTicket(ticketTypeId: number, enrollmentId: number) {
   const ticketMaker = await prisma.ticket.create({
-    data: { status, enrollmentId, ticketTypeId, createdAt, updatedAt: createdAt },
+    data: { status: 'RESERVED', enrollmentId: enrollmentId, ticketTypeId: ticketTypeId },
   });
   return ticketMaker;
 }
