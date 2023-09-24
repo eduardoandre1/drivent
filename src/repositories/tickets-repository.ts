@@ -9,7 +9,19 @@ export async function readType(): Promise<TicketType[]> {
   return type;
 }
 export async function readTicket(enrol: number): Promise<Ticket> {
-  const ticket = await prisma.ticket.findUnique({ where: { enrollmentId: enrol } });
+  const ticket = await prisma.ticket.findFirst({
+    select: {
+      id: true,
+      status: true,
+      ticketTypeId: true,
+      enrollmentId: true,
+      TicketType: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    where: { enrollmentId: enrol },
+  });
+
   return ticket;
 }
 

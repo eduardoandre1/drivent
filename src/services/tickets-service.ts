@@ -1,4 +1,4 @@
-import { TicketType } from '@prisma/client';
+import { Ticket, TicketType } from '@prisma/client';
 import { readTicket, readType } from '@/repositories/tickets-repository';
 
 export async function ticketTypeService() {
@@ -7,9 +7,12 @@ export async function ticketTypeService() {
   return types;
 }
 
-export async function getTicketsService() {
-  const enrol = 5;
+export async function getTicketsService(enrol: number) {
   const types = await readTicket(enrol);
   if (!types) throw { name: 'NotFoundError', message: 'not found ticket in database' };
   return types;
+}
+export async function createTicketService(entrada: Ticket) {
+  const types = await readTicket(entrada.ticketTypeId);
+  if (!types) throw { name: 'InvalidDataError', message: 'ticket type not found' };
 }
