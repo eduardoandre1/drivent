@@ -24,8 +24,7 @@ export async function createTicketService(entrada: Ticket, userId: number | stri
   }
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw { name: 'NotFoundError', message: 'not found enrollment in database' };
-
   if (entrada.ticketTypeId === undefined) throw { name: 'EnrollmentNotFoundError' };
-
   const ticket = await createTicket(entrada.ticketTypeId, enrollment.id);
+  return ticket;
 }
