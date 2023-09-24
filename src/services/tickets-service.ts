@@ -7,7 +7,10 @@ export async function ticketTypeService() {
   return types;
 }
 
-export async function getTicketsService(enrol: number) {
+export async function getTicketsService(enrol: number | string) {
+  if (typeof enrol === 'string') {
+    enrol = parseInt(enrol);
+  }
   const types = await readTicket(enrol);
   if (!types) throw { name: 'NotFoundError', message: 'not found ticket in database' };
   return types;
