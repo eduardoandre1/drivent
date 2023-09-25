@@ -18,13 +18,13 @@ export async function getTicketsService(userId: number | string) {
   if (!ticket) throw { name: 'NotFoundError', message: 'not found ticket in database' };
   return ticket;
 }
-export async function createTicketService(entrada: Ticket, userId: number | string) {
+export async function createTicketService(ticketTypeId: number | string, userId: number | string) {
   if (typeof userId === 'string') {
     userId = parseInt(userId);
   }
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw { name: 'NotFoundError', message: 'not found enrollment in database' };
-  if (entrada.ticketTypeId === undefined) throw { name: 'EnrollmentNotFoundError' };
-  const ticket = await createTicket(entrada.ticketTypeId, enrollment.id);
+  if (ticketTypeId === undefined) throw { name: 'EnrollmentNotFoundError' };
+  const ticket = await createTicket(ticketTypeId, enrollment.id);
   return ticket;
 }
