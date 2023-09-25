@@ -35,6 +35,7 @@ export async function createTicket(ticketTypeId: number | string, enrollmentId: 
   }
   const ticketMaker = await prisma.ticket.create({
     select: {
+      id: true,
       TicketType: true,
       status: true,
       createdAt: true,

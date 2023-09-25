@@ -22,6 +22,9 @@ export async function createTicketService(ticketTypeId: number | string, userId:
   if (typeof userId === 'string') {
     userId = parseInt(userId);
   }
+  if (typeof ticketTypeId === 'string') {
+    ticketTypeId = parseInt(ticketTypeId);
+  }
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw { name: 'NotFoundError', message: 'not found enrollment in database' };
   if (ticketTypeId === undefined) throw { name: 'EnrollmentNotFoundError' };
