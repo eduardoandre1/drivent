@@ -25,9 +25,30 @@ export async function readTicket(enrol: number): Promise<Ticket> {
   return ticket;
 }
 
-export async function createTicket(ticketTypeId: number, enrollmentId: number) {
+export async function createTicket(ticketTypeId: number | string, enrollmentId: number | string) {
+  const now = new Date();
+  if (typeof ticketTypeId === 'string') {
+    ticketTypeId = parseInt(ticketTypeId);
+  }
+  if (typeof enrollmentId === 'string') {
+    enrollmentId = parseInt(enrollmentId);
+  }
   const ticketMaker = await prisma.ticket.create({
-    data: { status: 'RESERVED', enrollmentId: enrollmentId, ticketTypeId: ticketTypeId },
+    select: {
+      TicketType: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      enrollmentId: true,
+      ticketTypeId: true,
+    },
+    data: {
+      status: 'RESERVED',
+      enrollmentId: enrollmentId,
+      ticketTypeId: ticketTypeId,
+      createdAt: now,
+      updatedAt: now,
+    },
   });
   return ticketMaker;
 }
