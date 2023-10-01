@@ -4,7 +4,7 @@ import faker from '@faker-js/faker';
 import * as jwt from 'jsonwebtoken';
 import { TicketStatus } from '@prisma/client';
 import { createHotels } from '../factories/hotels-factory';
-import { createEnrollmentWithAddress, createTicket, createTicketType, createUser } from '../factories';
+import { createEnrollmentWithAddress, createTicket, createTicketTypeEspecific, createUser } from '../factories';
 import { cleanDb, generateValidToken } from '../helpers';
 import app, { init } from '@/app';
 
@@ -15,10 +15,17 @@ beforeAll(async () => {
 beforeEach(async () => {
   await cleanDb();
 });
-
 const server = supertest(app);
+const TicketIncludeHotel = {
+  TRUE: true,
+  FALSE: false,
+};
+const TicketIsRemote = {
+  TRUE: true,
+  FALSE: false,
+};
 
-describe('get /hotels autentication ', () => {
+describe('get /hotels  ', () => {
   it('should respond with status 401 if no token is given', async () => {
     const response = await server.get('/hotels');
 
@@ -46,7 +53,7 @@ describe('get /hotels autentication ', () => {
     const user = await createUser();
     const token = await generateValidToken(user);
     const enrollment = await createEnrollmentWithAddress(user);
-    const ticketType = await createTicketType(true);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
     await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
 
     const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
@@ -58,7 +65,7 @@ describe('get /hotels autentication ', () => {
     const user = await createUser();
     const token = await generateValidToken(user);
     const enrollment = await createEnrollmentWithAddress(user);
-    const ticketType = await createTicketType(true);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
     //await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
 
     const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
@@ -69,7 +76,7 @@ describe('get /hotels autentication ', () => {
     const user = await createUser();
     const token = await generateValidToken(user);
     const enrollment = await createEnrollmentWithAddress(user);
-    const ticketType = await createTicketType(false);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.FALSE, TicketIsRemote.FALSE);
     await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
 
     const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
@@ -80,8 +87,18 @@ describe('get /hotels autentication ', () => {
     const user = await createUser();
     const token = await generateValidToken(user);
     const enrollment = await createEnrollmentWithAddress(user);
-    const ticketType = await createTicketType(true);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
     await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+    const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
+    expect(response.status).toBe(402);
+  });
+  it('should return a status 402 when ticket type is remote  ', async () => {
+    //const hotel = await createHotels();
+    const user = await createUser();
+    const token = await generateValidToken(user);
+    const enrollment = await createEnrollmentWithAddress(user);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.TRUE);
+    await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
     const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
     expect(response.status).toBe(402);
   });
@@ -91,7 +108,7 @@ describe('get /hotels autentication ', () => {
     const user = await createUser();
     const token = await generateValidToken(user);
     const enrollment = await createEnrollmentWithAddress(user);
-    const ticketType = await createTicketType(true);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
     await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
     const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
     expect(response.body).toHaveLength(2);
@@ -101,7 +118,7 @@ describe('get /hotels autentication ', () => {
     const user = await createUser();
     const token = await generateValidToken(user);
     const enrollment = await createEnrollmentWithAddress(user);
-    const ticketType = await createTicketType(true);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
     await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
     const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
     expect(response.body).toEqual([
@@ -115,4 +132,40 @@ describe('get /hotels autentication ', () => {
     ]);
   });
 });
-//describe('get /hotels/:id', () => {})
+describe('get /hotels/:id', () => {
+  it('should respond with status 401 if no token is given', async () => {
+    const response = await server.get('/hotels/1');
+
+    expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+  });
+
+  it('should respond with status 401 if given token is not valid', async () => {
+    const token = faker.lorem.word();
+    const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+  });
+
+  it('should respond with status 401 if there is no session for given token', async () => {
+    const userWithoutSession = await createUser();
+
+    const token = jwt.sign({ userId: userWithoutSession.id }, process.env.JWT_SECRET);
+
+    const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(httpStatus.UNAUTHORIZED);
+  });
+  it('should return a empty Object whem the token is valid', async () => {
+    //const hotel = await createHotels();
+    const user = await createUser();
+    const token = await generateValidToken(user);
+    const enrollment = await createEnrollmentWithAddress(user);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
+    await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+    const response = await server.get(`/hotels/1`).set('Authorization', `Bearer ${token}`);
+    expect(response.body).toEqual({});
+    expect(response.status).toBe(200);
+  });
+  it;
+});
