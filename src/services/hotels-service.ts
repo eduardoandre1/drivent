@@ -17,7 +17,7 @@ async function getHotelsList(userId: number) {
   if (includesHotel === false || ticket.status !== 'PAID' || isRemote === true) throw PaymentRequired();
 
   const hotels = await hotelsRepository.findHotels();
-  if (!hotels) throw notFoundError();
+  if (!hotels || hotels.length === 0) throw notFoundError();
   return hotels;
 }
 async function getHotelchoesenById(userId: number, hotelId: number) {

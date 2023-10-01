@@ -1,16 +1,13 @@
 import { Enrollment } from '@prisma/client';
 import { prisma } from '@/config';
-import { notFoundError } from '@/errors';
 
 async function findWithAddressByUserId(userId: number) {
-  const enrol = await prisma.enrollment.findFirst({
+  return prisma.enrollment.findFirst({
     where: { userId },
     include: {
       Address: true,
     },
   });
-  if (!enrol) throw notFoundError();
-  return enrol;
 }
 
 async function upsert(

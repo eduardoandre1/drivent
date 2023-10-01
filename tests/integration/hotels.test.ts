@@ -48,18 +48,6 @@ describe('get /hotels  ', () => {
 
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
-  it('should return a empty array whem the token is valid', async () => {
-    //const hotel = await createHotels();
-    const user = await createUser();
-    const token = await generateValidToken(user);
-    const enrollment = await createEnrollmentWithAddress(user);
-    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
-    await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
-
-    const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
-    expect(response.body).toEqual([]);
-    expect(response.status).toBe(200);
-  });
   it('should return a status 404 when ticket does not exist', async () => {
     //const hotel = await createHotels();
     const user = await createUser();
@@ -67,6 +55,17 @@ describe('get /hotels  ', () => {
     const enrollment = await createEnrollmentWithAddress(user);
     const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
     //await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+    const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
+    expect(response.status).toBe(404);
+  });
+  it('should return a status 404 when hotels does not exist', async () => {
+    //const hotel = await createHotels();
+    const user = await createUser();
+    const token = await generateValidToken(user);
+    const enrollment = await createEnrollmentWithAddress(user);
+    const ticketType = await createTicketTypeEspecific(TicketIncludeHotel.TRUE, TicketIsRemote.FALSE);
+    await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
 
     const response = await server.get(`/hotels`).set('Authorization', `Bearer ${token}`);
     expect(response.status).toBe(404);
@@ -166,5 +165,4 @@ describe('get /hotels/:id', () => {
     const response = await server.get(`/hotels/1`).set('Authorization', `Bearer ${token}`);
     expect(response.status).toBe(404);
   });
-  it;
 });
