@@ -155,7 +155,7 @@ describe('get /hotels/:id', () => {
 
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);
   });
-  it('should return a empty Object whem the token is valid', async () => {
+  it('should return 404 whem the token is valid and dont exist hotels', async () => {
     //const hotel = await createHotels();
     const user = await createUser();
     const token = await generateValidToken(user);
@@ -164,8 +164,7 @@ describe('get /hotels/:id', () => {
     await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
 
     const response = await server.get(`/hotels/1`).set('Authorization', `Bearer ${token}`);
-    expect(response.body).toEqual({});
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(404);
   });
   it;
 });

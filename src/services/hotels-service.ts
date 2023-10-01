@@ -3,10 +3,10 @@ import { enrollmentsService } from '@/services/enrollments-service';
 import { notFoundError } from '@/errors';
 import { PaymentRequired } from '@/errors/payment-required';
 import { hotelsRepository } from '@/repositories/hotels-repository';
-import { ticketsRepository } from '@/repositories';
+import { enrollmentRepository, ticketsRepository } from '@/repositories';
 
 async function getHotelsList(userId: number) {
-  const enrollment = await enrollmentsService.getOneWithAddressByUserId(userId);
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
