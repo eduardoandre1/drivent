@@ -2,9 +2,9 @@ import supertest from 'supertest';
 import httpStatus from 'http-status';
 import faker from '@faker-js/faker';
 import * as jwt from 'jsonwebtoken';
-import { Hotel } from '@prisma/client';
+import { Hotel, TicketStatus } from '@prisma/client';
 import { createHotels } from '../factories/hotels-factory';
-import { createEnrollmentWithAddress, createTicket, createUser } from '../factories';
+import { createEnrollmentWithAddress, createTicket, createTicketType, createUser } from '../factories';
 import { cleanDb, generateValidToken } from '../helpers';
 import { prisma } from '@/config';
 import app, { init } from '@/app';
@@ -44,9 +44,13 @@ describe('get /hotels autentication ', () => {
   });
   it('should return a empty array whem the token is valid', async () => {
     const hotel = await createHotels();
-    const token = await generateValidToken();
+
     const user = await createUser();
-    //await createEnrollmentWithAddress(user.id)
+    const token = await generateValidToken(user);
+    const enrollment = await createEnrollmentWithAddress(user);
+    const ticketType = await createTicketType();
+    const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
     const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
     expect(response.body).toEqual([
       {
