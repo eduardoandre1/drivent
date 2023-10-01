@@ -1,5 +1,5 @@
-import { enrollmentsService } from './enrollments-service';
 import { ticketsService } from './tickets-service';
+import { enrollmentsService } from '@/services/enrollments-service';
 import { notFoundError } from '@/errors';
 import { PaymentRequired } from '@/errors/payment-required';
 import { hotelsRepository } from '@/repositories/hotels-repository';
@@ -7,9 +7,11 @@ import { hotelsRepository } from '@/repositories/hotels-repository';
 async function getHotelsList(userId: number) {
   const enrollment = await enrollmentsService.getOneWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
+  console.log(enrollment);
 
   const ticket = await ticketsService.getTicketByUserId(enrollment.id);
   if (!ticket) throw notFoundError();
+  console.log(ticket);
 
   const includesHotel = ticket.TicketType.includesHotel;
   if (!includesHotel || ticket.status !== 'PAID') throw PaymentRequired();

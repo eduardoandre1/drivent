@@ -6,7 +6,7 @@ import { hotelsService } from '@/services/hotels-service';
 export async function getHotelsList(req: AuthenticatedRequest, res: Response) {
   const userId = req.userId;
   const hotels = await hotelsService.getHotelsList(userId);
-  res.status(httpStatus.OK).send(hotels);
+  res.status(httpStatus.OK).json(hotels);
 }
 
 export async function getHotelchoesenById(req: AuthenticatedRequest, res: Response) {
