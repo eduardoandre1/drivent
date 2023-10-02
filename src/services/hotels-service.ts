@@ -21,7 +21,7 @@ async function getHotelsList(userId: number) {
   return hotels;
 }
 async function getHotelchoesenById(userId: number, hotelId: number) {
-  const enrollment = await enrollmentsService.getOneWithAddressByUserId(userId);
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
