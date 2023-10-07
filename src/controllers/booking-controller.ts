@@ -15,7 +15,7 @@ async function postBooking(req: AuthenticatedRequest, res: Response) {
   if (!userId) throw unauthorizedError();
   const { roomId } = req.body;
   const booking = await bookingService.postBooking(userId, roomId);
-  res.status(httpStatus.CREATED).send(booking);
+  res.status(httpStatus.OK).send(booking);
 }
 async function putBooking(req: AuthenticatedRequest, res: Response) {
   const userId = req.userId;
