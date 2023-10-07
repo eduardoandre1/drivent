@@ -1,6 +1,18 @@
 import { prisma } from '@/config';
 
-async function readbyId(userId: number) {
+async function readbyId(bookingId: number) {
+  const booking = await prisma.booking.findFirst({
+    select: {
+      id: true,
+      Room: true,
+    },
+    where: {
+      id: bookingId,
+    },
+  });
+  return booking;
+}
+async function readbyuserId(userId: number) {
   const booking = await prisma.booking.findFirst({
     select: {
       id: true,
@@ -44,6 +56,7 @@ async function update(userId: number, roomId: number, bookingId: number) {
 }
 const bookingRepository = {
   readbyId,
+  readbyuserId,
   create,
   update,
   countRoom,

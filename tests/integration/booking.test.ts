@@ -74,8 +74,35 @@ describe('put /booking', () => {
     await createEnrollmentWithAddress(user);
     const booking = await createBooking(user);
     const roomId = booking.Room.id;
-    const putBooking = await server.put('/booking').set('Authorization', `Bearer ${token}`).send({ roomId });
+    const putBooking = await server
+      .put(`/booking/${booking.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ roomId });
     expect(putBooking.status).toBe(httpStatus.OK);
     expect(putBooking.body).toEqual({ bookingId: booking.id });
+  });
+  it('should return 403 when dont exist booking', async () => {
+    const user = await createUser();
+    const token = await generateValidToken(user);
+    await createEnrollmentWithAddress(user);
+    const roomId = faker.random.numeric(5);
+    const bookingId = faker.random.numeric(5);
+    const putBooking = await server
+      .put(`/booking/${bookingId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ roomId });
+    expect(putBooking.status).toBe(httpStatus.FORBIDDEN);
+  });
+  it('should return 404 when dont exist room', async () => {
+    const user = await createUser();
+    const token = await generateValidToken(user);
+    await createEnrollmentWithAddress(user);
+    const booking = await createBooking(user);
+    const roomId = parseInt(faker.random.numeric(2));
+    const putBooking = await server
+      .put(`/booking/${booking.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ roomId });
+    expect(putBooking.status).toBe(httpStatus.NOT_FOUND);
   });
 });

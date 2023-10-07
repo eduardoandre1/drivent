@@ -6,7 +6,7 @@ import { bookingRepository, roomRepository, enrollmentRepository, ticketsReposit
 async function getBookingbyid(userId: number | undefined) {
   if (!userId) throw unauthorizedError();
 
-  const booking = await bookingRepository.readbyId(userId);
+  const booking = await bookingRepository.readbyuserId(userId);
   if (!booking) throw notFoundError('booking not found');
   return booking;
 }
@@ -33,10 +33,10 @@ async function postBooking(userId: number, roomId: number) {
   const booking = await bookingRepository.create(userId, roomId);
   return { bookingId: booking.id };
 }
-async function putBooking(userId: number, roomId: number) {
+async function putBooking(userId: number, roomId: number, bookingId: number) {
   if (!userId) throw unauthorizedError();
 
-  const bookingOld = await bookingRepository.readbyId(userId);
+  const bookingOld = await bookingRepository.readbyId(bookingId);
   if (!bookingOld)
     throw ForbiddenError(
       'you need a booking to update if you already have a booking please try again or contact the administrator',
@@ -48,7 +48,7 @@ async function putBooking(userId: number, roomId: number) {
   const countRoom = await bookingRepository.countRoom(roomId);
   if (room.capacity <= countRoom) throw ForbiddenError('you cannot booking this room because is full capacity');
 
-  const bookingUpdate = await bookingRepository.update(userId, roomId, bookingOld.id);
+  const bookingUpdate = await bookingRepository.update(userId, roomId, bookingId);
   return { bookingId: bookingUpdate.id };
 }
 const bookingService = {
