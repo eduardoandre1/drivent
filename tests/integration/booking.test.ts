@@ -3,7 +3,13 @@ import httpStatus from 'http-status';
 import faker from '@faker-js/faker';
 import { TicketStatus } from '@prisma/client';
 import { cleanDb, generateValidToken } from '../helpers';
-import { createEnrollmentWithAddress, createTicket, createTicketType, createUser } from '../factories';
+import {
+  createEnrollmentWithAddress,
+  createTicket,
+  createTicketType,
+  createTicketTypeEspecific,
+  createUser,
+} from '../factories';
 import { createBooking } from '../factories/booking-factory';
 import { createRoom } from '../factories/room-factory';
 import app, { init } from '@/app';
@@ -31,17 +37,23 @@ describe('get /booking', () => {
     const getBooking = await server.get('/booking').set('Authorization', `Bearer ${token}`);
     expect(getBooking.status).toBe(httpStatus.UNAUTHORIZED);
   });
+  it('should return 404 when dont have a booking', async () => {
+    const user = await createUser();
+    const token = await generateValidToken(user);
+    await createEnrollmentWithAddress(user);
+  });
 });
 describe('post /booking', () => {
   it('should return 200 when everything allright', async () => {
     const user = await createUser();
     const token = await generateValidToken(user);
     const enrollment = await createEnrollmentWithAddress(user);
-    const tycketType = await createTicketType();
-    await createTicket(enrollment.id, tycketType.id, TicketStatus.RESERVED);
+    const tycketType = await createTicketTypeEspecific(true, false);
+    await createTicket(enrollment.id, tycketType.id, TicketStatus.PAID);
     const Room = await createRoom();
     const postBooking = await server.post('/booking').set('Authorization', `Bearer ${token}`).send({ roomId: Room.id });
     console.log(postBooking.body);
     expect(postBooking.status).toBe(httpStatus.CREATED);
   });
+  it('should return ');
 });
