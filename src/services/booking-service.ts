@@ -1,13 +1,17 @@
-import { notFoundError } from '@/errors';
+import { notFoundError, unauthorizedError } from '@/errors';
 import { ForbiddenError } from '@/errors/Forbidden-error';
+
 import { bookingRepository, roomRepository, enrollmentRepository, ticketsRepository } from '@/repositories';
 
-async function getBookingbyid(userId: number) {
+async function getBookingbyid(userId: number | undefined) {
+  if (!userId) throw unauthorizedError();
+
   const booking = await bookingRepository.readbyId(userId);
   if (!booking) throw notFoundError('booking not found');
   return booking;
 }
 async function postBooking(userId: number, roomId: number) {
+  if (!userId) throw unauthorizedError();
   // validação de ticket
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw ForbiddenError('you must have a enrollment to booking a Room');
@@ -30,6 +34,8 @@ async function postBooking(userId: number, roomId: number) {
   return { bookingId: booking.id };
 }
 async function putBooking(userId: number, roomId: number) {
+  if (!userId) throw unauthorizedError();
+
   const bookingOld = await bookingRepository.readbyId(userId);
   if (!bookingOld)
     throw ForbiddenError(

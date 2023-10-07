@@ -97,7 +97,14 @@ enum TicketStatus {
   RESERVED
   PAID
 }
-
+enum TicketIncluidesHotel {
+  TRUE
+  FALSE
+}
+enum TicketIsRemote {
+  TRUE
+  FALSE
+}
 model Payment {
   id             Int      @id @default(autoincrement())
   ticketId       Int      @unique
