@@ -1,19 +1,41 @@
 import { notFoundError } from '@/errors';
-import { bookingRepository } from '@/repositories';
+import { ForbiddenError } from '@/errors/Forbidden-error';
+import { bookingRepository, roomRepository, enrollmentRepository, ticketsRepository } from '@/repositories';
 
 async function getBookingbyid(userId: number) {
-  const booking = await bookingRepository.read(userId);
+  const booking = await bookingRepository.readbyId(userId);
   if (!booking) throw notFoundError('booking not found');
   return booking;
 }
 async function postBooking(userId: number, roomId: number) {
+  // validação de ticket
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) throw ForbiddenError('you must have a enrollment to booking a Room');
+
+  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
+  if (!ticket) throw ForbiddenError('you must have a ticket to booking a Room');
+
+  const room = await roomRepository.read(roomId);
+  if (!room) throw notFoundError('room not found');
+
+  const countRoom = await bookingRepository.countRoom(roomId);
+  if (room.capacity <= countRoom) throw ForbiddenError('you cannot booking this room because is full capacity');
+
   const booking = await bookingRepository.create(userId, roomId);
   return { bookingId: booking.id };
 }
 async function putBooking(userId: number, roomId: number) {
-  const { id } = await bookingRepository.read(userId);
-  const booking = await bookingRepository.update(userId, roomId, id);
-  return { bookingId: booking.id };
+  const bookingOld = await bookingRepository.readbyId(userId);
+  if (!bookingOld)
+    throw ForbiddenError(
+      'you need a booking to update if you already have a booking please try again or contact the administrator',
+    );
+
+  const room = await roomRepository.read(roomId);
+  if (!room) throw notFoundError('not found the room');
+
+  const bookingUpdate = await bookingRepository.update(userId, roomId, bookingOld.id);
+  return { bookingId: bookingUpdate.id };
 }
 const bookingService = {
   getBookingbyid,

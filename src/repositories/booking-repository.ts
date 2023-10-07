@@ -1,6 +1,6 @@
 import { prisma } from '@/config';
 
-async function read(userId: number) {
+async function readbyId(userId: number) {
   const booking = await prisma.booking.findFirst({
     select: {
       id: true,
@@ -12,12 +12,17 @@ async function read(userId: number) {
   });
   return booking;
 }
+async function countRoom(roomId: number) {
+  const booking = await prisma.booking.count({
+    where: {
+      roomId: roomId,
+    },
+  });
+  return booking;
+}
 
 async function create(userId: number, roomId: number) {
   const booking = await prisma.booking.create({
-    select: {
-      id: true,
-    },
     data: {
       userId: userId,
       roomId: roomId,
@@ -27,9 +32,6 @@ async function create(userId: number, roomId: number) {
 }
 async function update(userId: number, roomId: number, bookingId: number) {
   const booking = await prisma.booking.update({
-    select: {
-      id: true,
-    },
     data: {
       userId: userId,
       roomId: roomId,
@@ -41,8 +43,9 @@ async function update(userId: number, roomId: number, bookingId: number) {
   return booking;
 }
 const bookingRepository = {
-  read,
+  readbyId,
   create,
   update,
+  countRoom,
 };
 export { bookingRepository };
